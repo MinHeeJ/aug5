@@ -11,15 +11,32 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CommonAdminService {
-  private static final Map<String, List<String>> REQUIRED = Map.of(
-      "users", List.of("user_id", "employee_no", "name", "employment_status"),
-      "organizations", List.of("organization_code", "organization_name", "organization_type", "effective_from"),
-      "positions", List.of("user_id", "valid_from"),
-      "roles", List.of("role_code", "role_name", "purpose", "default_data_scope"),
-      "user-roles", List.of("user_id", "role_code", "valid_from"),
-      "menu-permissions", List.of("role_code"),
-      "feature-permissions", List.of("role_code"),
-      "data-scopes", List.of("role_code"));
+  private static final Map<String, List<String>> REQUIRED = Map.ofEntries(
+      Map.entry("users", List.of("user_id", "employee_no", "name", "employment_status")),
+      Map.entry("organizations", List.of("organization_code", "organization_name", "organization_type", "effective_from")),
+      Map.entry("positions", List.of("user_id", "valid_from")),
+      Map.entry("roles", List.of("role_code", "role_name", "purpose", "default_data_scope")),
+      Map.entry("user-roles", List.of("user_id", "role_code", "valid_from")),
+      Map.entry("menu-permissions", List.of("role_code")),
+      Map.entry("feature-permissions", List.of("role_code")),
+      Map.entry("data-scopes", List.of("role_code")),
+      Map.entry("menus", List.of("menu_id", "menu_name", "sort_order")),
+      Map.entry("code-groups", List.of("group_code", "group_name")),
+      Map.entry("codes", List.of("group_code", "code", "code_name")),
+      Map.entry("config", List.of("config_key", "config_value")),
+      Map.entry("years", List.of("base_year", "status")),
+      Map.entry("file-policies", List.of("policy_code", "policy_name")),
+      Map.entry("notices", List.of("notice_title", "notice_body")),
+      Map.entry("attachments", List.of("file_name", "storage_path")),
+      Map.entry("upload-forms", List.of("form_code", "form_name")),
+      Map.entry("uploads", List.of("upload_name", "upload_status")),
+      Map.entry("downloads", List.of("download_name", "download_status")),
+      Map.entry("pii", List.of("subject_user_id", "request_type", "process_status")),
+      Map.entry("access", List.of("user_id", "access_type")),
+      Map.entry("audit", List.of("actor_user_id", "action_type", "target_type", "target_key")),
+      Map.entry("batches", List.of("batch_code", "batch_name")),
+      Map.entry("batch-runs", List.of("batch_code", "run_status")),
+      Map.entry("batch-results", List.of("run_id", "result_status")));
 
   private final CommonMapper mapper;
   private final ObjectMapper objectMapper;
@@ -35,6 +52,10 @@ public class CommonAdminService {
     int safePage = Math.max(1, page);
     List<Map<String, Object>> items = mapper.selectPage(entity, query, (safePage - 1) * size, size);
     return new PageResult(items, safePage, size, mapper.count(entity, query));
+  }
+
+  public java.util.Optional<Map<String, Object>> findLoginUser(String userId) {
+    return java.util.Optional.ofNullable(mapper.findUser(userId));
   }
 
   @Transactional

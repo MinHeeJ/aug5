@@ -4,11 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -38,13 +40,22 @@ public class ApiController {
   @PostMapping("/auth/login")
   Map<String, Object> login(@Valid @RequestBody LoginRequest body, HttpServletRequest request,
                             HttpServletResponse response) {
-    Authentication authentication = authenticationManager.authenticate(
-        new UsernamePasswordAuthenticationToken(body.userId(), body.password()));
+    Map<String, Object> user = service.findLoginUser(body.userId())
+        .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호를 확인하세요"));
+    if (!body.password().equals(String.valueOf(user.get("password")))
+        || !Boolean.TRUE.equals(user.get("system_enabled"))) {
+      throw new IllegalArgumentException("아이디 또는 비밀번호를 확인하세요");
+    }
+    String roleCode = String.valueOf(user.getOrDefault("role_code", "R09"));
+    Authentication authentication = new UsernamePasswordAuthenticationToken(
+        body.userId(), null, List.of(new SimpleGrantedAuthority("ROLE_" + roleCode)));
+    ((UsernamePasswordAuthenticationToken) authentication)
+        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
     SecurityContext context = SecurityContextHolder.createEmptyContext();
     context.setAuthentication(authentication);
     SecurityContextHolder.setContext(context);
     securityContexts.saveContext(context, request, response);
-    return Map.of("userId", authentication.getName(), "roleCode", "R09");
+    return Map.of("userId", authentication.getName(), "roleCode", roleCode);
   }
 
   @GetMapping("/auth/me")
@@ -170,6 +181,24 @@ public class ApiController {
   @PostMapping("/admin/data-scopes")
   CommonAdminService.SaveResult createDataScopes(@RequestBody Map<String, Object> data, Authentication authentication) {
     return service.create("data-scopes", data, authentication.getName());
+  }
+
+
+  @PreAuthorize("hasRole('R09')")
+  @GetMapping("/admin/{entity}")
+  CommonAdminService.PageResult listGeneric(@PathVariable String entity,
+                                            @RequestParam(required = false) String query,
+                                            @RequestParam(defaultValue = "1") int page,
+                                            @RequestParam(defaultValue = "20") int size) {
+    return service.list(entity, query, page, size);
+  }
+
+  @PreAuthorize("hasRole('R09')")
+  @PostMapping("/admin/{entity}")
+  CommonAdminService.SaveResult createGeneric(@PathVariable String entity,
+                                              @RequestBody Map<String, Object> data,
+                                              Authentication authentication) {
+    return service.create(entity, data, authentication.getName());
   }
 
   @PreAuthorize("hasRole('R09')")

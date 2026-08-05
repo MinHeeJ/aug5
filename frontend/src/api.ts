@@ -6,7 +6,24 @@ export type Entity =
   | "user-roles"
   | "menu-permissions"
   | "feature-permissions"
-  | "data-scopes";
+  | "data-scopes"
+  | "menus"
+  | "code-groups"
+  | "codes"
+  | "config"
+  | "years"
+  | "file-policies"
+  | "notices"
+  | "attachments"
+  | "upload-forms"
+  | "uploads"
+  | "downloads"
+  | "pii"
+  | "access"
+  | "audit"
+  | "batches"
+  | "batch-runs"
+  | "batch-results";
 
 export type Row = Record<string, unknown>;
 export type ApiFieldErrors = Record<string, string>;

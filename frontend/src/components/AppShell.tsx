@@ -51,7 +51,7 @@ export function AppShell() {
             />
           ))}
         </nav>
-        <div className="nav-group-title">후속 배치 준비</div>
+        <div className="nav-group-title">파일·보안·운영 관리</div>
         <nav>
           {placeholders.map(([label, path]) => (
             <NavItem key={path} to={path} label={label} icon="·" />
