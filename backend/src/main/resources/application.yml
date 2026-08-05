@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/knue}
+    username: ${DB_USERNAME:knue}
+    password: ${DB_PASSWORD:knue}
+  flyway:
+    enabled: true
+  session:
+    store-type: none
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: false
+server:
+  servlet:
+    session:
+      cookie:
+        name: SESSION
+        http-only: true
+        same-site: lax

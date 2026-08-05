@@ -1,0 +1,279 @@
+openapi: 3.0.3
+info:
+  title: KNUE Common Foundation Batch 1 API
+  version: 1.0.0
+servers:
+  - url: /
+components:
+  securitySchemes:
+    SessionCookie: { type: apiKey, in: cookie, name: SESSION }
+  schemas:
+    ApiResponse: { type: object }
+    ApiError: { type: object }
+security:
+  - SessionCookie: []
+paths:
+  /api/health:
+    get:
+      operationId: getHealth
+      summary: Health check
+      x-no-requirement-reason: Infrastructure health probe required by acceptance criteria.
+      responses:
+        "200": { description: OK }
+  /api/admin/users:
+    get:
+      operationId: listUserManagement
+      summary: User management list
+      x-related-requirements: [REQ-001]
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: size, in: query, schema: { type: integer, enum: [20, 50, 100], default: 20 } }
+      responses:
+        "200": { description: Paged result }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+    post:
+      operationId: saveUserManagement
+      summary: User management save
+      x-related-requirements: [REQ-001]
+      x-business-rules:
+        - Only authenticated R09 users with feature permission can save this record.
+        - Server-side validation rejects invalid or unauthorized changes.
+      x-side-effects:
+        - Persists the record and writes audit_logs with before and after values.
+      x-required-tests:
+        - happy: valid admin save -> follow-up list shows persisted record
+        - auth: missing session -> 401 is returned
+        - validation: missing required identifier -> field error is returned
+        - business: unauthorized role -> target table remains unchanged and 403 is returned
+        - side-effect: successful save -> audit_logs row exists
+      responses:
+        "200": { description: Saved }
+        "400": { description: Validation error }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+  /api/admin/organizations:
+    get:
+      operationId: listOrganizationManagement
+      summary: Organization management list
+      x-related-requirements: [REQ-002]
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: size, in: query, schema: { type: integer, enum: [20, 50, 100], default: 20 } }
+      responses:
+        "200": { description: Paged result }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+    post:
+      operationId: saveOrganizationManagement
+      summary: Organization management save
+      x-related-requirements: [REQ-002]
+      x-business-rules:
+        - Only authenticated R09 users with feature permission can save this record.
+        - Server-side validation rejects invalid or unauthorized changes.
+      x-side-effects:
+        - Persists the record and writes audit_logs with before and after values.
+      x-required-tests:
+        - happy: valid admin save -> follow-up list shows persisted record
+        - auth: missing session -> 401 is returned
+        - validation: missing required identifier -> field error is returned
+        - business: unauthorized role -> target table remains unchanged and 403 is returned
+        - side-effect: successful save -> audit_logs row exists
+      responses:
+        "200": { description: Saved }
+        "400": { description: Validation error }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+  /api/admin/positions:
+    get:
+      operationId: listPositionManagement
+      summary: Position management list
+      x-related-requirements: [REQ-003]
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: size, in: query, schema: { type: integer, enum: [20, 50, 100], default: 20 } }
+      responses:
+        "200": { description: Paged result }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+    post:
+      operationId: savePositionManagement
+      summary: Position management save
+      x-related-requirements: [REQ-003]
+      x-business-rules:
+        - Only authenticated R09 users with feature permission can save this record.
+        - Server-side validation rejects invalid or unauthorized changes.
+      x-side-effects:
+        - Persists the record and writes audit_logs with before and after values.
+      x-required-tests:
+        - happy: valid admin save -> follow-up list shows persisted record
+        - auth: missing session -> 401 is returned
+        - validation: missing required identifier -> field error is returned
+        - business: unauthorized role -> target table remains unchanged and 403 is returned
+        - side-effect: successful save -> audit_logs row exists
+      responses:
+        "200": { description: Saved }
+        "400": { description: Validation error }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+  /api/admin/roles:
+    get:
+      operationId: listRoleManagement
+      summary: Role management list
+      x-related-requirements: [REQ-004]
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: size, in: query, schema: { type: integer, enum: [20, 50, 100], default: 20 } }
+      responses:
+        "200": { description: Paged result }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+    post:
+      operationId: saveRoleManagement
+      summary: Role management save
+      x-related-requirements: [REQ-004]
+      x-business-rules:
+        - Only authenticated R09 users with feature permission can save this record.
+        - Server-side validation rejects invalid or unauthorized changes.
+      x-side-effects:
+        - Persists the record and writes audit_logs with before and after values.
+      x-required-tests:
+        - happy: valid admin save -> follow-up list shows persisted record
+        - auth: missing session -> 401 is returned
+        - validation: missing required identifier -> field error is returned
+        - business: unauthorized role -> target table remains unchanged and 403 is returned
+        - side-effect: successful save -> audit_logs row exists
+      responses:
+        "200": { description: Saved }
+        "400": { description: Validation error }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+  /api/admin/user-roles:
+    get:
+      operationId: listUserRoleManagement
+      summary: User role management list
+      x-related-requirements: [REQ-005]
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: size, in: query, schema: { type: integer, enum: [20, 50, 100], default: 20 } }
+      responses:
+        "200": { description: Paged result }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+    post:
+      operationId: saveUserRoleManagement
+      summary: User role management save
+      x-related-requirements: [REQ-005]
+      x-business-rules:
+        - Only authenticated R09 users with feature permission can save this record.
+        - Server-side validation rejects invalid or unauthorized changes.
+      x-side-effects:
+        - Persists the record and writes audit_logs with before and after values.
+      x-required-tests:
+        - happy: valid admin save -> follow-up list shows persisted record
+        - auth: missing session -> 401 is returned
+        - validation: missing required identifier -> field error is returned
+        - business: unauthorized role -> target table remains unchanged and 403 is returned
+        - side-effect: successful save -> audit_logs row exists
+      responses:
+        "200": { description: Saved }
+        "400": { description: Validation error }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+  /api/admin/menu-permissions:
+    get:
+      operationId: listMenuPermissionManagement
+      summary: Menu permission management list
+      x-related-requirements: [REQ-006]
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: size, in: query, schema: { type: integer, enum: [20, 50, 100], default: 20 } }
+      responses:
+        "200": { description: Paged result }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+    post:
+      operationId: saveMenuPermissionManagement
+      summary: Menu permission management save
+      x-related-requirements: [REQ-006]
+      x-business-rules:
+        - Only authenticated R09 users with feature permission can save this record.
+        - Server-side validation rejects invalid or unauthorized changes.
+      x-side-effects:
+        - Persists the record and writes audit_logs with before and after values.
+      x-required-tests:
+        - happy: valid admin save -> follow-up list shows persisted record
+        - auth: missing session -> 401 is returned
+        - validation: missing required identifier -> field error is returned
+        - business: unauthorized role -> target table remains unchanged and 403 is returned
+        - side-effect: successful save -> audit_logs row exists
+      responses:
+        "200": { description: Saved }
+        "400": { description: Validation error }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+  /api/admin/feature-permissions:
+    get:
+      operationId: listFeaturePermissionManagement
+      summary: Feature permission management list
+      x-related-requirements: [REQ-007]
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: size, in: query, schema: { type: integer, enum: [20, 50, 100], default: 20 } }
+      responses:
+        "200": { description: Paged result }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+    post:
+      operationId: saveFeaturePermissionManagement
+      summary: Feature permission management save
+      x-related-requirements: [REQ-007]
+      x-business-rules:
+        - Only authenticated R09 users with feature permission can save this record.
+        - Server-side validation rejects invalid or unauthorized changes.
+      x-side-effects:
+        - Persists the record and writes audit_logs with before and after values.
+      x-required-tests:
+        - happy: valid admin save -> follow-up list shows persisted record
+        - auth: missing session -> 401 is returned
+        - validation: missing required identifier -> field error is returned
+        - business: unauthorized role -> target table remains unchanged and 403 is returned
+        - side-effect: successful save -> audit_logs row exists
+      responses:
+        "200": { description: Saved }
+        "400": { description: Validation error }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+  /api/admin/data-scopes:
+    get:
+      operationId: listDataScopePermissionManagement
+      summary: Data scope permission management list
+      x-related-requirements: [REQ-008]
+      parameters:
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: size, in: query, schema: { type: integer, enum: [20, 50, 100], default: 20 } }
+      responses:
+        "200": { description: Paged result }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+    post:
+      operationId: saveDataScopePermissionManagement
+      summary: Data scope permission management save
+      x-related-requirements: [REQ-008]
+      x-business-rules:
+        - Only authenticated R09 users with feature permission can save this record.
+        - Server-side validation rejects invalid or unauthorized changes.
+      x-side-effects:
+        - Persists the record and writes audit_logs with before and after values.
+      x-required-tests:
+        - happy: valid admin save -> follow-up list shows persisted record
+        - auth: missing session -> 401 is returned
+        - validation: missing required identifier -> field error is returned
+        - business: unauthorized role -> target table remains unchanged and 403 is returned
+        - side-effect: successful save -> audit_logs row exists
+      responses:
+        "200": { description: Saved }
+        "400": { description: Validation error }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+x-uncovered-requirements: []
